@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Delivery Royale 3D</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>#gameCanvas{z-index:0!important;position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important}</style>
+</head>
+<body>
+
+    <div id="orientationWarning">
+        <div class="warning-content">📱 กรุณาหมุนจอนอนเพื่อเล่นเกม!</div>
+    </div>
+
+    <!-- 🧱 MINECRAFT MAIN MENU -->
+    <div id="lobbyOverlay">
+        <div class="mc-title">DELIVERY ROYALE</div>
+
+        <div id="menuMain" class="mc-card">
+            <button class="mc-btn mc-btn-green" onclick="switchPage('play'); playSound('click');">▶ เล่นเกม (Play)</button>
+            <button class="mc-btn" onclick="switchPage('custom'); playSound('click');">🎨 แต่งตัวละคร</button>
+            <button class="mc-btn" onclick="switchPage('settings'); playSound('click');">⚙️ ตั้งค่าเสียง</button>
+        </div>
+
+        <div id="menuPlay" class="mc-card" style="display: none;">
+            <div class="mc-row">
+                <input type="number" id="hostRoomCode" value="1234" placeholder="รหัส 4 หลัก" style="flex:1; text-align:center;">
+                <button class="mc-btn mc-btn-green" onclick="enableAutoLandscape(); playSound('click'); createHostRoom();">สร้างห้อง</button>
+            </div>
+            <div class="mc-row">
+                <input type="number" id="inputJoinCode" placeholder="รหัสห้องเพื่อน" style="flex:1; text-align:center;">
+                <button class="mc-btn mc-btn-blue" onclick="enableAutoLandscape(); playSound('click'); joinRoom();">จอยห้อง</button>
+            </div>
+            
+            <div class="mc-status" id="statusText">สถานะ: พร้อมสร้างหรือเข้าห้อง</div>
+            <div style="font-size: 0.75rem; color:#aaa; text-align:center;">ผู้เล่นในห้อง: <span id="playerCountText">1</span>/4</div>
+
+            <button class="mc-btn mc-btn-yellow" id="btnStartGame" onclick="playSound('click'); requestStartGame();" disabled>เริ่มเกมทันที 🚀</button>
+            <button class="mc-btn" onclick="switchPage('main'); playSound('click');">⬅️ ย้อนกลับ</button>
+        </div>
+
+        <div id="menuCustom" class="mc-card" style="display: none;">
+            <div class="mc-field">
+                <label>ชื่อพนักงานส่งของ:</label>
+                <input type="text" id="inputName" value="Delivery_01" maxlength="10" oninput="onProfileChange()">
+            </div>
+            <div class="mc-field">
+                <label>สียูนิฟอร์ม:</label>
+                <input type="color" id="inputColor" value="#38bdf8" oninput="onProfileChange()">
+            </div>
+            <div class="mc-field">
+                <label>เครื่องประดับ & หมวก:</label>
+                <select id="inputHat" onchange="onProfileChange()">
+                    <option value="none">ไม่ใส่</option>
+                    <option value="crown">👑 มงกุฎราชา</option>
+                    <option value="cap">🧢 หมวกแก๊ป</option>
+                    <option value="horns">😈 เขาปีศาจ</option>
+                    <option value="headphones">🎧 หูฟังเกมมิ่ง</option>
+                    <option value="glasses">🕶️ แว่นตาดำเท่ๆ</option>
+                    <option value="mohawk">🎸 ผมโมฮ็อกพั้งค์</option>
+                </select>
+            </div>
+            <button class="mc-btn" onclick="switchPage('main'); playSound('click');">⬅️ บันทึก & ย้อนกลับ</button>
+        </div>
+
+        <div id="menuSettings" class="mc-card" style="display: none;">
+            <div class="mc-field">
+                <label>ความดังเสียงดนตรี BGM: <span id="volVal">50</span>%</label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="updateVolume(this.value)">
+            </div>
+            <button class="mc-btn" onclick="switchPage('main'); playSound('click');">⬅️ ย้อนกลับ</button>
+        </div>
+    </div>
+
+    <!-- 🎮 IN-GAME HUD -->
+    <div id="hudOverlay">
+        <div class="top-hud">
+            <div class="leaderboard" id="lbContainer">
+                <div style="font-size:0.7rem; color:#38bdf8; font-weight:900; border-bottom:1px solid #334155; padding-bottom:2px;">🏆 คะแนน</div>
+            </div>
+            <div class="timer-box" id="timerDisplay">03:00</div>
+        </div>
+
+        <div class="controls-zone">
+            <div id="joystickBase" class="interactive">
+                <div id="joystickKnob"></div>
+            </div>
+            
+            <!-- ⚔️ ปุ่มใช้อาวุธแบบใช้ครั้งเดียว -->
+            <button class="btn-item interactive" id="btnUseItem" onclick="useInventoryItem();" style="display: none;"></button>
+        </div>
+    </div>
+
+    <script src="js/sound.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
